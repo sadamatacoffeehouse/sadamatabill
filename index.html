@@ -3,11 +3,11 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>SADAMATA COFFEE HOUSE - BILL RECEIPT</title>
+  <title>SADAMATA COFFEE HOUSE - BILL</title>
   <style>
     body {
       font-family: monospace;
-      max-width: 320px;
+      max-width: 300px;
       margin: auto;
       padding: 10px;
       font-size: 14px;
@@ -22,30 +22,32 @@
     .address {
       font-size: 12px;
     }
-    .bill-box {
+    .border-box {
       border: 1px solid black;
       padding: 10px;
       margin-top: 10px;
     }
-    .items {
+    table {
       width: 100%;
       border-collapse: collapse;
       margin-top: 10px;
     }
-    .items th, .items td {
+    th, td {
       padding: 2px;
-      border-bottom: 1px dotted #ccc;
     }
-    .items td:nth-child(2),
-    .items td:nth-child(3),
-    .items td:nth-child(4) {
+    th {
+      border-bottom: 1px dashed #000;
+    }
+    td:nth-child(2),
+    td:nth-child(3),
+    td:nth-child(4) {
       text-align: right;
     }
     .solid-line {
       border-top: 1px solid #000;
-      margin: 10px 0;
+      margin: 8px 0;
     }
-    .total {
+    .totals {
       text-align: right;
     }
     #qrcode {
@@ -59,10 +61,10 @@
   <div class="center title">SADAMATA COFFEE HOUSE</div>
   <div class="center address">Sadamata Village, Ekterpur, Noapara, Jeshore.</div>
 
-  <div class="bill-box">
+  <div class="border-box">
     <div class="center"><strong>BILL RECEIPT</strong></div>
 
-    <table class="items">
+    <table>
       <thead>
         <tr>
           <th>Item</th>
@@ -71,16 +73,14 @@
           <th>Total</th>
         </tr>
       </thead>
-      <tbody id="itemRows">
-        <!-- Items will be inserted here -->
-      </tbody>
+      <tbody id="itemRows"></tbody>
     </table>
 
     <div class="solid-line"></div>
 
-    <div class="total">
+    <div class="totals">
       Subtotal: <span id="subtotal">0</span> TK<br>
-      Discount: (<span id="discount">10</span>%) => <span id="discountAmount">0</span> TK<br>
+      Discount (<span id="discount">10</span>%): <span id="discountAmount">0</span> TK<br>
       <strong>Grand Total: <span id="grandtotal">0</span> TK</strong>
     </div>
 
@@ -90,8 +90,8 @@
   <script src="https://cdn.jsdelivr.net/npm/qrcode/build/qrcode.min.js"></script>
   <script>
     const items = [
-      { name: "Black Coffee", qty: 2, price: 40 },
-      { name: "Milk Tea", qty: 1, price: 25 },
+      { name: "Milk Tea", qty: 2, price: 30 },
+      { name: "Egg Toast", qty: 1, price: 35 },
       { name: "Biscuit", qty: 3, price: 10 }
     ];
     const discountPercent = 10;
@@ -100,33 +100,30 @@
     let subtotal = 0;
 
     items.forEach(item => {
-      const row = document.createElement("tr");
       const total = item.qty * item.price;
       subtotal += total;
-
-      row.innerHTML = `
+      const tr = document.createElement("tr");
+      tr.innerHTML = `
         <td>${item.name}</td>
         <td>${item.qty}</td>
         <td>${item.price}</td>
         <td>${total}</td>
       `;
-      tbody.appendChild(row);
+      tbody.appendChild(tr);
     });
 
     const discountAmount = (subtotal * discountPercent) / 100;
     const grandTotal = subtotal - discountAmount;
 
-    document.getElementById("subtotal").innerText = subtotal;
-    document.getElementById("discount").innerText = discountPercent;
-    document.getElementById("discountAmount").innerText = discountAmount.toFixed(2);
-    document.getElementById("grandtotal").innerText = grandTotal.toFixed(2);
+    document.getElementById("subtotal").textContent = subtotal.toFixed(2);
+    document.getElementById("discountAmount").textContent = discountAmount.toFixed(2);
+    document.getElementById("grandtotal").textContent = grandTotal.toFixed(2);
 
-    const billData = `Sadamata Coffee House\nSubtotal: ${subtotal} TK\nDiscount: ${discountPercent}%\nDiscount Amount: ${discountAmount.toFixed(2)} TK\nGrand Total: ${grandTotal.toFixed(2)} TK`;
+    const billText = `Sadamata Coffee House\nSubtotal: ${subtotal.toFixed(2)} TK\nDiscount: ${discountPercent}% (${discountAmount.toFixed(2)} TK)\nGrand Total: ${grandTotal.toFixed(2)} TK`;
 
-    QRCode.toDataURL(billData, function (err, url) {
+    QRCode.toDataURL(billText, function (err, url) {
       const img = document.createElement('img');
       img.src = url;
-      img.alt = "QR Code";
       img.style.width = "120px";
       document.getElementById('qrcode').appendChild(img);
     });
