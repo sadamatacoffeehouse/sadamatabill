@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>SADAMATA COFFEE HOUSE - BILL</title>
+  <title>Invoice - SADAMATA COFFEE HOUSE</title>
   <style>
     body {
       font-family: monospace;
@@ -12,86 +12,85 @@
       padding: 10px;
       font-size: 14px;
     }
-    .center {
-      text-align: center;
+    .center { text-align: center; }
+    .bold { font-weight: bold; }
+    .box {
+      border: 1px solid #000;
+      padding: 5px;
+      margin: 10px 0;
     }
-    .title {
-      font-weight: bold;
-      font-size: 16px;
-    }
-    .address {
-      font-size: 12px;
-    }
-    .border-box {
-      border: 1px solid black;
-      padding: 10px;
-      margin-top: 10px;
+    .line {
+      border-top: 1px solid #000;
+      margin: 5px 0;
     }
     table {
       width: 100%;
       border-collapse: collapse;
-      margin-top: 10px;
     }
     th, td {
-      padding: 2px;
-    }
-    th {
-      border-bottom: 1px dashed #000;
+      padding: 2px 0;
     }
     td:nth-child(2),
     td:nth-child(3),
     td:nth-child(4) {
       text-align: right;
     }
-    .solid-line {
-      border-top: 1px solid #000;
-      margin: 8px 0;
-    }
-    .totals {
-      text-align: right;
-    }
     #qrcode {
-      margin-top: 10px;
       text-align: center;
+      margin-top: 10px;
+    }
+    .footer {
+      margin-top: 10px;
+      font-size: 12px;
+      display: flex;
+      justify-content: space-between;
     }
   </style>
 </head>
 <body>
 
-  <div class="center title">SADAMATA COFFEE HOUSE</div>
-  <div class="center address">Sadamata Village, Ekterpur, Noapara, Jeshore.</div>
+  <div class="center bold">SADAMATA COFFEE HOUSE</div>
+  <div class="center">Sadamata Village, Ekterpur, Noapara, Jeshore.</div>
 
-  <div class="border-box">
-    <div class="center"><strong>BILL RECEIPT</strong></div>
+  <div class="box center bold">INVOICE</div>
 
-    <table>
-      <thead>
-        <tr>
-          <th>Item</th>
-          <th>Qty</th>
-          <th>Price</th>
-          <th>Total</th>
-        </tr>
-      </thead>
-      <tbody id="itemRows"></tbody>
-    </table>
+  <div>
+    Bill No: #1007<br>
+    Date: <span id="date"></span><br>
+    Time: <span id="time"></span>
+  </div>
 
-    <div class="solid-line"></div>
+  <table>
+    <thead>
+      <tr>
+        <th>Item</th>
+        <th>Qty</th>
+        <th>Price</th>
+        <th>Total</th>
+      </tr>
+    </thead>
+    <tbody id="itemRows"></tbody>
+  </table>
 
-    <div class="totals">
-      Subtotal: <span id="subtotal">0</span> TK<br>
-      Discount (<span id="discount">10</span>%): <span id="discountAmount">0</span> TK<br>
-      <strong>Grand Total: <span id="grandtotal">0</span> TK</strong>
-    </div>
+  <div class="line"></div>
 
-    <div id="qrcode"></div>
+  <div style="text-align:right;">
+    Software Discount (<span id="discount">10</span>%): -<span id="discountAmount">0</span> TK<br>
+    <strong>Total: <span id="grandtotal">0</span> TK</strong>
+  </div>
+
+  <div id="qrcode"></div>
+
+  <div class="footer">
+    <div>Have a nice day!</div>
+    <div>— Admin</div>
   </div>
 
   <script src="https://cdn.jsdelivr.net/npm/qrcode/build/qrcode.min.js"></script>
   <script>
     const items = [
       { name: "Milk Tea", qty: 2, price: 30 },
-      { name: "Egg Toast", qty: 1, price: 35 },
+      { name: "Toast", qty: 1, price: 35 },
       { name: "Biscuit", qty: 3, price: 10 }
     ];
     const discountPercent = 10;
@@ -115,11 +114,10 @@
     const discountAmount = (subtotal * discountPercent) / 100;
     const grandTotal = subtotal - discountAmount;
 
-    document.getElementById("subtotal").textContent = subtotal.toFixed(2);
     document.getElementById("discountAmount").textContent = discountAmount.toFixed(2);
     document.getElementById("grandtotal").textContent = grandTotal.toFixed(2);
 
-    const billText = `Sadamata Coffee House\nSubtotal: ${subtotal.toFixed(2)} TK\nDiscount: ${discountPercent}% (${discountAmount.toFixed(2)} TK)\nGrand Total: ${grandTotal.toFixed(2)} TK`;
+    const billText = `SADAMATA COFFEE HOUSE\nBill No: #1007\nTotal: ${subtotal} TK\nDiscount: ${discountPercent}%\nFinal: ${grandTotal} TK`;
 
     QRCode.toDataURL(billText, function (err, url) {
       const img = document.createElement('img');
@@ -127,6 +125,10 @@
       img.style.width = "120px";
       document.getElementById('qrcode').appendChild(img);
     });
+
+    const now = new Date();
+    document.getElementById("date").textContent = now.toLocaleDateString();
+    document.getElementById("time").textContent = now.toLocaleTimeString();
   </script>
 </body>
 </html>
