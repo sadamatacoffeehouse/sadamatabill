@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -73,7 +74,6 @@
       </tr>
     </thead>
     <tbody id="bill-items">
-      <!-- Items will be added here -->
     </tbody>
   </table>
 
@@ -94,7 +94,6 @@
 
   <script src="https://cdn.jsdelivr.net/npm/qrious@4.0.2/dist/qrious.min.js"></script>
   <script>
-    // বিলের তথ্য
     const items = [
       { name: 'Milk Tea', qty: 2, price: 30 },
       { name: 'Toast', qty: 1, price: 35 },
@@ -102,12 +101,10 @@
     ];
     const discountPercentage = 10;
 
-    // তারিখ ও সময়
     const now = new Date();
     document.getElementById('date').textContent = now.toISOString().split('T')[0];
     document.getElementById('time').textContent = now.toTimeString().split(' ')[0];
 
-    // বিল প্রিন্ট
     const tbody = document.getElementById('bill-items');
     let subtotal = 0;
     items.forEach(item => {
@@ -124,7 +121,6 @@
       tbody.appendChild(row);
     });
 
-    // ডিসকাউন্ট ও মোট
     const discountAmount = (subtotal * discountPercentage) / 100;
     const total = subtotal - discountAmount;
 
@@ -133,11 +129,12 @@
     document.getElementById('total').textContent = total.toFixed(2);
     document.getElementById('discountPercent').textContent = discountPercentage;
 
-    // QR কোড তৈরি
     const qr = new QRious({
       element: document.getElementById('qrcode'),
       size: 150,
-      value: `Total: ${total.toFixed(2)} TK\nDate: ${now.toLocaleDateString()}\nTime: ${now.toLocaleTimeString()}`
+      value: `Total: ${total.toFixed(2)} TK
+Date: ${now.toLocaleDateString()}
+Time: ${now.toLocaleTimeString()}`
     });
   </script>
 </body>
