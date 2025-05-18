@@ -1,58 +1,95 @@
-
 <!DOCTYPE html>
 <html>
 <head>
   <meta charset="UTF-8">
-  <title>SADAMATA COFFEE HOUSE - BILLING SYSTEM</title>
+  <title>SADAMATA COFFEE HOUSE - RECEIPT</title>
   <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
     body {
       font-family: monospace;
-      width: 300px;
-      margin: auto;
+      background: #fff;
+      color: #000;
+      max-width: 300px;
+      margin: 0 auto;
       padding: 10px;
-      text-align: center;
-      border: 1px dashed #000;
     }
-    .header {
+    .center { text-align: center; }
+    .bold { font-weight: bold; }
+    .title {
       font-size: 16px;
-      font-weight: bold;
+      margin-bottom: 5px;
     }
     .address {
       font-size: 12px;
       margin-bottom: 10px;
     }
-    .bill-box {
+    .receipt-box {
       border: 1px solid #000;
-      display: inline-block;
-      padding: 4px 12px;
+      padding: 4px 10px;
       margin-bottom: 10px;
-      font-weight: bold;
+      display: inline-block;
     }
-    .item-line {
-      display: flex;
-      justify-content: space-between;
+    .info {
       font-size: 12px;
-      border-bottom: 1px dotted #000;
+      margin-bottom: 10px;
     }
-    .summary {
+    .items {
+      font-size: 12px;
+      width: 100%;
+      margin-bottom: 10px;
+    }
+    .items th, .items td {
+      text-align: left;
+      padding: 2px 0;
+    }
+    .items th:nth-child(2),
+    .items td:nth-child(2),
+    .items th:nth-child(3),
+    .items td:nth-child(3) {
       text-align: right;
+    }
+    .total {
       font-size: 13px;
       margin-top: 10px;
+      text-align: right;
+    }
+    .footer {
+      font-size: 12px;
+      margin-top: 15px;
     }
   </style>
 </head>
 <body>
-  <div class="header">SADAMATA COFFEE HOUSE</div>
-  <div class="address">Sadamata Village, Ekterpur, Noapara, Jeshore</div>
-  <div class="bill-box">BILL RECEIPT</div>
+  <div class="center bold title">SADAMATA COFFEE HOUSE</div>
+  <div class="center address">Sadamata Village, Ekterpur<br>Noapara, Jeshore</div>
+  <div class="center receipt-box">BILL RECEIPT</div>
 
-  <div class="item-line"><span>Black Coffee</span><span>2 x 40 = 80</span></div>
-  <div class="item-line"><span>Milk Tea</span><span>1 x 25 = 25</span></div>
-  <div class="item-line"><span>Biscuit</span><span>3 x 10 = 30</span></div>
+  <div class="info">
+    Bill No: 000123<br>
+    Date: 2025-05-17<br>
+    Time: 12:45 PM
+  </div>
 
-  <div class="summary">
-    <div>Total Bills Today: 5</div>
-    <div>Total Amount: 135 TK</div>
+  <table class="items">
+    <thead>
+      <tr><th>Item</th><th>Qty</th><th>Total</th></tr>
+    </thead>
+    <tbody>
+      <tr><td>Black Coffee</td><td>2</td><td>80</td></tr>
+      <tr><td>Milk Tea</td><td>1</td><td>25</td></tr>
+      <tr><td>Biscuit</td><td>3</td><td>30</td></tr>
+    </tbody>
+  </table>
+
+  <div class="total">
+    Subtotal: 135 TK<br>
+    Discount: 0 TK<br>
+    <strong>Grand Total: 135 TK</strong>
+  </div>
+
+  <div class="footer center">
+    Cashier: Admin<br>
+    Thank you! Please visit again.
   </div>
 </body>
 </html>
