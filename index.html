@@ -3,63 +3,65 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Invoice - SADAMATA COFFEE HOUSE</title>
+  <title>Sadamata Invoice</title>
   <style>
     body {
       font-family: monospace;
       max-width: 300px;
       margin: auto;
       padding: 10px;
-      font-size: 14px;
-    }
-    .center { text-align: center; }
-    .bold { font-weight: bold; }
-    .box {
       border: 1px solid #000;
-      padding: 5px;
-      margin: 10px 0;
     }
-    .line {
-      border-top: 1px solid #000;
+    h2, h3, p {
+      text-align: center;
       margin: 5px 0;
+    }
+    .invoice-box {
+      border: 1px solid black;
+      padding: 5px;
+      text-align: center;
+      font-weight: bold;
+      margin: 10px 0;
     }
     table {
       width: 100%;
       border-collapse: collapse;
+      margin-bottom: 10px;
     }
     th, td {
-      padding: 2px 0;
+      text-align: left;
     }
-    td:nth-child(2),
-    td:nth-child(3),
-    td:nth-child(4) {
+    .total-section {
       text-align: right;
     }
-    #qrcode {
-      text-align: center;
-      margin-top: 10px;
+    .line {
+      border-top: 1px dashed black;
+      margin: 10px 0;
     }
     .footer {
-      margin-top: 10px;
-      font-size: 12px;
+      margin-top: 20px;
       display: flex;
       justify-content: space-between;
+    }
+    .center {
+      text-align: center;
+    }
+    canvas {
+      display: block;
+      margin: 10px auto;
     }
   </style>
 </head>
 <body>
 
-  <div class="center bold">SADAMATA COFFEE HOUSE</div>
-  <div class="center">Sadamata Village, Ekterpur, Noapara, Jeshore.</div>
+  <h2>SADAMATA COFFEE HOUSE</h2>
+  <p>Sadamata Village, Ekterpur,<br>Noapara, Jeshore.</p>
 
-  <div class="box center bold">INVOICE</div>
+  <div class="invoice-box">INVOICE</div>
 
-  <div>
-    Bill No: #1007<br>
-    Date: <span id="date"></span><br>
-    Time: <span id="time"></span>
-    
-  </div>
+  <p>Bill No: #1007</p>
+  <p>Date: <span id="date"></span></p>
+  <p>Time: <span id="time"></span></p>
 
   <table>
     <thead>
@@ -70,68 +72,73 @@
         <th>Total</th>
       </tr>
     </thead>
-    <tbody id="itemRows"></tbody>
+    <tbody id="bill-items">
+      <!-- Items will be added here -->
+    </tbody>
   </table>
 
   <div class="line"></div>
 
-  <div style="text-align:right;">
-    Subtotal: <span id="subtotal">0</span> TK<br>
-    Discount (<span id="discount">10</span>%): -<span id="discountAmount">0</span> TK<br>
-    <strong>Total: <span id="grandtotal">0</span> TK</strong>
+  <div class="total-section">
+    <p>Subtotal: <span id="subtotal">0.00</span> TK</p>
+    <p>Discount (<span id="discountPercent">10</span>%): -<span id="discountAmount">0.00</span> TK</p>
+    <p><strong>Total: <span id="total">0.00</span> TK</strong></p>
   </div>
 
-  <div id="qrcode"></div>
+  <canvas id="qrcode"></canvas>
 
   <div class="footer">
-    <div>Have a nice day!</div>
-    <div>— Admin</div>
+    <span>Have a nice day!</span>
+    <span>— Admin</span>
   </div>
 
-  <script src="https://cdn.jsdelivr.net/npm/qrcode/build/qrcode.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/qrious@4.0.2/dist/qrious.min.js"></script>
   <script>
+    // বিলের তথ্য
     const items = [
-      { name: "Milk Tea", qty: 2, price: 30 },
-      { name: "Toast", qty: 1, price: 35 },
-      { name: "Biscuit", qty: 3, price: 10 }
+      { name: 'Milk Tea', qty: 2, price: 30 },
+      { name: 'Toast', qty: 1, price: 35 },
+      { name: 'Biscuit', qty: 3, price: 10 }
     ];
-    const discountPercent = 10;
+    const discountPercentage = 10;
 
-    const tbody = document.getElementById("itemRows");
+    // তারিখ ও সময়
+    const now = new Date();
+    document.getElementById('date').textContent = now.toISOString().split('T')[0];
+    document.getElementById('time').textContent = now.toTimeString().split(' ')[0];
+
+    // বিল প্রিন্ট
+    const tbody = document.getElementById('bill-items');
     let subtotal = 0;
-
     items.forEach(item => {
       const total = item.qty * item.price;
       subtotal += total;
-      const tr = document.createElement("tr");
-      tr.innerHTML = `
+
+      const row = document.createElement('tr');
+      row.innerHTML = `
         <td>${item.name}</td>
         <td>${item.qty}</td>
         <td>${item.price}</td>
         <td>${total}</td>
       `;
-      tbody.appendChild(tr);
+      tbody.appendChild(row);
     });
 
-    const discountAmount = (subtotal * discountPercent) / 100;
-    const grandTotal = subtotal - discountAmount;
+    // ডিসকাউন্ট ও মোট
+    const discountAmount = (subtotal * discountPercentage) / 100;
+    const total = subtotal - discountAmount;
 
-    document.getElementById("subtotal").textContent = subtotal.toFixed(2);
-    document.getElementById("discountAmount").textContent = discountAmount.toFixed(2);
-    document.getElementById("grandtotal").textContent = grandTotal.toFixed(2);
+    document.getElementById('subtotal').textContent = subtotal.toFixed(2);
+    document.getElementById('discountAmount').textContent = discountAmount.toFixed(2);
+    document.getElementById('total').textContent = total.toFixed(2);
+    document.getElementById('discountPercent').textContent = discountPercentage;
 
-    const billText = `SADAMATA COFFEE HOUSE\nBill No: #1007\nTotal: ${subtotal} TK\nDiscount: ${discountPercent}%\nFinal: ${grandTotal} TK`;
-
-    QRCode.toDataURL(billText, function (err, url) {
-      const img = document.createElement('img');
-      img.src = url;
-      img.style.width = "120px";
-      document.getElementById('qrcode').appendChild(img);
+    // QR কোড তৈরি
+    const qr = new QRious({
+      element: document.getElementById('qrcode'),
+      size: 150,
+      value: `Total: ${total.toFixed(2)} TK\nDate: ${now.toLocaleDateString()}\nTime: ${now.toLocaleTimeString()}`
     });
-
-    const now = new Date();
-    document.getElementById("date").textContent = now.toLocaleDateString();
-    document.getElementById("time").textContent = now.toLocaleTimeString();
   </script>
 </body>
 </html>
