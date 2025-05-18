@@ -57,7 +57,7 @@
   <div>
     Bill No: #1007<br>
     Date: <span id="date"></span><br>
-    Time: <span id="time"></span>
+    Time: <span id="time"></span> Have a nice tea time!
   </div>
 
   <table>
@@ -75,7 +75,8 @@
   <div class="line"></div>
 
   <div style="text-align:right;">
-    Software Discount (<span id="discount">10</span>%): -<span id="discountAmount">0</span> TK<br>
+    Subtotal: <span id="subtotal">0</span> TK<br>
+    Discount (<span id="discount">10</span>%): -<span id="discountAmount">0</span> TK<br>
     <strong>Total: <span id="grandtotal">0</span> TK</strong>
   </div>
 
@@ -114,6 +115,7 @@
     const discountAmount = (subtotal * discountPercent) / 100;
     const grandTotal = subtotal - discountAmount;
 
+    document.getElementById("subtotal").textContent = subtotal.toFixed(2);
     document.getElementById("discountAmount").textContent = discountAmount.toFixed(2);
     document.getElementById("grandtotal").textContent = grandTotal.toFixed(2);
 
