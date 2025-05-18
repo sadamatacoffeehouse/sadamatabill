@@ -1,6 +1,21 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
+<<style>
+  @media print {
+    body * {
+      visibility: hidden;
+    }
+    #receipt, #receipt * {
+      visibility: visible;
+    }
+    #receipt {
+      position: absolute;
+      left: 0;
+      top: 0;
+      width: 100%;
+    }
+  }
+</style>>
   <meta charset="UTF-8">
   <title>SADAMATA COFFEE HOUSE - Invoice</title>
   <style>
