@@ -1,196 +1,100 @@
-<!DOCTYPE html>
-<html lang="en">
-<<style>
-  @media print {
-    body * {
-      visibility: hidden;
-    }
-    #receipt, #receipt * {
-      visibility: visible;
-    }
-    #receipt {
-      position: absolute;
-      left: 0;
-      top: 0;
-      width: 100%;
-    }
-  }
-</style>>
+<!DOCTYPE html><html>
+<head>
   <meta charset="UTF-8">
-  <title>SADAMATA COFFEE HOUSE - Invoice</title>
+  <title>SADAMATA COFFEE HOUSE - INVOICE</title>
   <style>
     body {
-      font-family: Arial, sans-serif;
-      max-width: 400px;
+      font-family: 'Courier New', monospace;
+      background: #f5f5f5;
+      margin: 0;
+      padding: 0;
+    }
+    .container {
+      max-width: 320px;
       margin: auto;
+      background: white;
       padding: 10px;
-      background: #fff;
-    }
-    h2, h3 {
-      text-align: center;
-      text-transform: uppercase;
-    }
-    #invoice-box {
-      border: 2px solid black;
-      padding: 10px;
-      margin-top: 10px;
-    }
-    table {
-      width: 100%;
-      border-collapse: collapse;
-    }
-    th, td {
-      text-align: left;
-      padding: 4px;
-    }
-    th {
-      background: #f0f0f0;
-    }
-    hr {
-      border-top: 2px dashed #000;
-      margin: 10px 0;
-    }
-    .right {
-      text-align: right;
+      box-shadow: 0 0 5px #aaa;
     }
     .center {
       text-align: center;
     }
-    #qrcode {
+    .bold {
+      font-weight: bold;
+    }
+    .invoice-box {
+      border: 1px solid black;
+      padding: 5px;
+      margin: 5px 0;
+      text-align: center;
+      font-size: 18px;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 14px;
+    }
+    td {
+      padding: 3px;
+    }
+    .right {
+      text-align: right;
+    }
+    .line {
+      border-top: 1px dashed #000;
+      margin: 5px 0;
+    }
+    .footer {
       margin-top: 10px;
       text-align: center;
+      font-size: 13px;
+    }
+    @media print {
+      body * {
+        visibility: hidden;
+      }
+      #receipt, #receipt * {
+        visibility: visible;
+      }
+      #receipt {
+        position: absolute;
+        left: 0;
+        top: 0;
+        width: 100%;
+      }
     }
   </style>
 </head>
 <body>
-
-<h2>SADAMATA COFFEE HOUSE</h2>
-<p class="center">Sadamata Village, Ekterpur, Noapara, Jeshore</p>
-
-<div id="invoice-box">
-  <h3>INVOICE</h3>
-  <p><strong>Bill No:</strong> <span id="billNo">#0001</span></p>
-  <p><strong>Date:</strong> <span id="date"></span> | <strong>Time:</strong> <span id="time"></span></p>
-
-  <hr>
-
-  <label for="itemSelect">Select Item: </label>
-  <select id="itemSelect" onchange="fillItemDetails(this.value)">
-    <option value="">--Choose--</option>
-    <option value="Tea,10">Tea</option>
-    <option value="Coffee,15">Coffee</option>
-    <option value="Snacks,30">Snacks</option>
-  </select><br><br>
-
-  <input type="text" id="item" placeholder="Item Name">
-  <input type="number" id="qty" placeholder="Quantity">
-  <input type="number" id="price" placeholder="Unit Price">
-  <button onclick="addItem()">Add Item</button>
-
-  <table id="itemsTable">
+<div class="container" id="receipt">
+  <div class="center bold">SADAMATA COFFEE HOUSE</div>
+  <div class="center">Sadamata Village, Ekterpur, Noapara, Jeshore</div>
+  <div class="invoice-box bold">INVOICE</div>  <table>
+    <tr><td>Bill No:</td><td class="right" id="billNo">#1002</td></tr>
+    <tr><td>Date:</td><td class="right" id="date">2025-05-17</td></tr>
+    <tr><td>Time:</td><td class="right" id="time">02:40 PM</td></tr>
+  </table>  <div class="line"></div>  <table>
     <thead>
-      <tr>
-        <th>Item</th>
-        <th>Qty</th>
-        <th>Price</th>
-        <th>Total</th>
+      <tr class="bold">
+        <td>Item</td><td class="right">Qty</td><td class="right">Price</td><td class="right">Total</td>
       </tr>
     </thead>
-    <tbody></tbody>
-  </table>
-
-  <hr>
-
-  <p><strong>Subtotal:</strong> <span id="subtotal">0</span></p>
-  <p><strong>Discount (%):</strong> <input id="discount" type="number" value="0" onchange="updateTotals()"> </p>
-  <p><strong>Total:</strong> <span id="total">0</span></p>
-
-  <div id="qrcode"></div>
-
-  <p class="center">Have a nice day!</p>
-  <p class="right">-- Admin</p>
-
-  <button onclick="printInvoice()">Print</button>
+    <tbody id="items">
+      <tr><td>Tea</td><td class="right">2</td><td class="right">10</td><td class="right">20</td></tr>
+      <tr><td>Snacks</td><td class="right">1</td><td class="right">30</td><td class="right">30</td></tr>
+    </tbody>
+  </table>  <div class="line"></div>  <table>
+    <tr><td class="bold">Subtotal:</td><td class="right">50</td></tr>
+    <tr><td class="bold">Discount (10%):</td><td class="right">-5</td></tr>
+    <tr><td class="bold">Total:</td><td class="right">45</td></tr>
+  </table>  <div class="center">
+    <img src="https://api.qrserver.com/v1/create-qr-code/?size=120x120&data=Bill%20No%20%231002%20Total%2045" alt="QR Code">
+  </div>  <div class="footer">
+    Have a nice day!<br>
+    -- Admin Authority --
+  </div>
+</div><div class="center" style="margin: 20px;">
+  <button onclick="window.print()">Print</button>
 </div>
-
-<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
-<script>
-  let items = [];
-
-  function fillItemDetails(value) {
-    if (value) {
-      const [name, price] = value.split(',');
-      document.getElementById('item').value = name;
-      document.getElementById('price').value = price;
-    }
-  }
-
-  function addItem() {
-    const name = document.getElementById('item').value;
-    const qty = parseInt(document.getElementById('qty').value);
-    const price = parseFloat(document.getElementById('price').value);
-    if (!name || !qty || !price) return alert("Please enter valid data");
-
-    const total = qty * price;
-    items.push({ name, qty, price, total });
-    updateTable();
-    saveToStorage();
-  }
-
-  function updateTable() {
-    const tbody = document.querySelector("#itemsTable tbody");
-    tbody.innerHTML = "";
-    let subtotal = 0;
-
-    items.forEach(item => {
-      const row = `<tr><td>${item.name}</td><td>${item.qty}</td><td>${item.price}</td><td>${item.total}</td></tr>`;
-      tbody.innerHTML += row;
-      subtotal += item.total;
-    });
-
-    document.getElementById("subtotal").innerText = subtotal.toFixed(2);
-    updateTotals();
-  }
-
-  function updateTotals() {
-    const discount = parseFloat(document.getElementById("discount").value) || 0;
-    const subtotal = parseFloat(document.getElementById("subtotal").innerText);
-    const discounted = subtotal - (subtotal * discount / 100);
-    document.getElementById("total").innerText = discounted.toFixed(2);
-
-    generateQR(discounted.toFixed(2));
-  }
-
-  function generateQR(value) {
-    document.getElementById("qrcode").innerHTML = "";
-    new QRCode(document.getElementById("qrcode"), "Total Bill: " + value);
-  }
-
-  function printInvoice() {
-    window.print();
-  }
-
-  function saveToStorage() {
-    localStorage.setItem("invoiceData", JSON.stringify(items));
-  }
-
-  function loadFromStorage() {
-    const data = localStorage.getItem("invoiceData");
-    if (data) {
-      items = JSON.parse(data);
-      updateTable();
-    }
-  }
-
-  function updateDateTime() {
-    const now = new Date();
-    document.getElementById("date").innerText = now.toLocaleDateString();
-    document.getElementById("time").innerText = now.toLocaleTimeString();
-  }
-
-  updateDateTime();
-  loadFromStorage();
-</script>
-
 </body>
 </html>
