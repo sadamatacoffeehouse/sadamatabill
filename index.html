@@ -1,141 +1,107 @@
-
-<!DOCTYPE html>
-<html lang="en">
+<!DOCTYPE html><html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Sadamata Invoice</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>SADAMATA BILLING SYSTEM</title>
   <style>
     body {
-      font-family: monospace;
-      max-width: 300px;
-      margin: auto;
+      font-family: Arial, sans-serif;
       padding: 10px;
-      border: 1px solid #000;
+      max-width: 400px;
+      margin: auto;
     }
-    h2, h3, p {
+    h2, h3 {
       text-align: center;
+    }
+    input, button {
+      padding: 8px;
       margin: 5px 0;
-    }
-    .invoice-box {
-      border: 1px solid black;
-      padding: 5px;
-      text-align: center;
-      font-weight: bold;
-      margin: 10px 0;
+      width: 100%;
     }
     table {
       width: 100%;
       border-collapse: collapse;
-      margin-bottom: 10px;
+      margin-top: 10px;
     }
     th, td {
-      text-align: left;
+      border: 1px solid #000;
+      text-align: center;
+      padding: 4px;
     }
-    .total-section {
-      text-align: right;
-    }
-    .line {
-      border-top: 1px dashed black;
-      margin: 10px 0;
-    }
-    .footer {
-      margin-top: 20px;
-      display: flex;
-      justify-content: space-between;
+    hr {
+      border-top: 2px dotted #000;
     }
     .center {
       text-align: center;
     }
-    canvas {
-      display: block;
-      margin: 10px auto;
+    #qrcode {
+      text-align: center;
+      margin-top: 15px;
     }
   </style>
 </head>
 <body>
-
   <h2>SADAMATA COFFEE HOUSE</h2>
-  <p>Sadamata Village, Ekterpur,<br>Noapara, Jeshore.</p>
-
-  <div class="invoice-box">INVOICE</div>
-
-  <p>Bill No: #1007</p>
-  <p>Date: <span id="date"></span></p>
-  <p>Time: <span id="time"></span></p>
-
-  <table>
+  <p class="center">Sadamata Village, Ekterpur, Noapara, Jeshore</p>
+  <h3 style="border: 1px solid #000; padding: 5px;">INVOICE</h3>  <div>
+    <label>Item Name:</label>
+    <input type="text" id="item" />
+    <label>Quantity:</label>
+    <input type="number" id="qty" />
+    <label>Price:</label>
+    <input type="number" id="price" />
+    <button onclick="addItem()">Add Item</button>
+  </div>  <table id="billTable">
     <thead>
-      <tr>
-        <th>Item</th>
-        <th>Qty</th>
-        <th>Price</th>
-        <th>Total</th>
-      </tr>
+      <tr><th>Item</th><th>Qty</th><th>Price</th><th>Total</th></tr>
     </thead>
-    <tbody id="bill-items">
-    </tbody>
-  </table>
+    <tbody></tbody>
+  </table>  <hr />
+  <p>Subtotal: <span id="subtotal">0</span></p>
+  <label>Discount (%):</label>
+  <input type="number" id="discount" oninput="updateTotal()" />
+  <p>Total after Discount: <span id="total">0</span></p>  <div id="qrcode"></div>  <p class="center">Have a nice day!</p>
+  <p class="center">- Admin</p>  <script src="https://cdnjs.cloudflare.com/ajax/libs/qrious/4.0.2/qrious.min.js"></script>  <script>
+    let items = [];
 
-  <div class="line"></div>
+    function addItem() {
+      const item = document.getElementById("item").value;
+      const qty = parseInt(document.getElementById("qty").value);
+      const price = parseFloat(document.getElementById("price").value);
+      if (item && qty && price) {
+        const total = qty * price;
+        items.push({ item, qty, price, total });
+        updateTable();
+      }
+    }
 
-  <div class="total-section">
-    <p>Subtotal: <span id="subtotal">0.00</span> TK</p>
-    <p>Discount (<span id="discountPercent">10</span>%): -<span id="discountAmount">0.00</span> TK</p>
-    <p><strong>Total: <span id="total">0.00</span> TK</strong></p>
-  </div>
+    function updateTable() {
+      const tbody = document.querySelector("#billTable tbody");
+      tbody.innerHTML = "";
+      let subtotal = 0;
+      items.forEach(row => {
+        subtotal += row.total;
+        const tr = `<tr><td>${row.item}</td><td>${row.qty}</td><td>${row.price}</td><td>${row.total}</td></tr>`;
+        tbody.innerHTML += tr;
+      });
+      document.getElementById("subtotal").innerText = subtotal.toFixed(2);
+      updateTotal();
+    }
 
-  <canvas id="qrcode"></canvas>
+    function updateTotal() {
+      const discount = parseFloat(document.getElementById("discount").value) || 0;
+      const subtotal = parseFloat(document.getElementById("subtotal").innerText);
+      const total = subtotal - (subtotal * discount / 100);
+      document.getElementById("total").innerText = total.toFixed(2);
 
-  <div class="footer">
-    <span>Have a nice day!</span>
-    <span>— Admin</span>
-  </div>
-
-  <script src="https://cdn.jsdelivr.net/npm/qrious@4.0.2/dist/qrious.min.js"></script>
-  <script>
-    const items = [
-      { name: 'Milk Tea', qty: 2, price: 30 },
-      { name: 'Toast', qty: 1, price: 35 },
-      { name: 'Biscuit', qty: 3, price: 10 }
-    ];
-    const discountPercentage = 10;
-
-    const now = new Date();
-    document.getElementById('date').textContent = now.toISOString().split('T')[0];
-    document.getElementById('time').textContent = now.toTimeString().split(' ')[0];
-
-    const tbody = document.getElementById('bill-items');
-    let subtotal = 0;
-    items.forEach(item => {
-      const total = item.qty * item.price;
-      subtotal += total;
-
-      const row = document.createElement('tr');
-      row.innerHTML = `
-        <td>${item.name}</td>
-        <td>${item.qty}</td>
-        <td>${item.price}</td>
-        <td>${total}</td>
-      `;
-      tbody.appendChild(row);
-    });
-
-    const discountAmount = (subtotal * discountPercentage) / 100;
-    const total = subtotal - discountAmount;
-
-    document.getElementById('subtotal').textContent = subtotal.toFixed(2);
-    document.getElementById('discountAmount').textContent = discountAmount.toFixed(2);
-    document.getElementById('total').textContent = total.toFixed(2);
-    document.getElementById('discountPercent').textContent = discountPercentage;
-
-    const qr = new QRious({
-      element: document.getElementById('qrcode'),
-      size: 150,
-      value: `Total: ${total.toFixed(2)} TK
-Date: ${now.toLocaleDateString()}
-Time: ${now.toLocaleTimeString()}`
-    });
-  </script>
-</body>
+      const qr = new QRious({
+        element: document.createElement("canvas"),
+        size: 150,
+        value: `Total: ${total.toFixed(2)}`
+      });
+      const qrDiv = document.getElementById("qrcode");
+      qrDiv.innerHTML = "";
+      qrDiv.appendChild(qr.image);
+    }
+  </script></body>
 </html>
