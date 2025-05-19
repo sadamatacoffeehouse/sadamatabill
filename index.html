@@ -1,111 +1,145 @@
-<!DOCTYPE html><html lang="en">
+<!DOCTYPE html>
+<html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Sadamata Invoice</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Sadamatata Invoice</title>
   <style>
     body {
       font-family: Arial, sans-serif;
-      margin: 0;
-      padding: 1rem;
+      padding: 10px;
       background: #f9f9f9;
     }
-    .invoice {
-      max-width: 380px;
+    .invoice-box {
+      max-width: 400px;
       margin: auto;
+      border: 1px solid #ccc;
+      padding: 10px;
       background: white;
-      padding: 1rem;
-      box-shadow: 0 0 10px rgba(0,0,0,0.1);
     }
     .center {
       text-align: center;
-      font-weight: bold;
-    }
-    .title {
-      font-size: 1.2rem;
-      margin-bottom: 0.2rem;
-    }
-    .address {
-      font-size: 0.85rem;
-      margin-bottom: 1rem;
-    }
-    .box {
-      border: 2px solid black;
-      padding: 4px;
-      display: inline-block;
-      margin-bottom: 1rem;
     }
     table {
       width: 100%;
-      border-collapse: collapse;
-      margin-bottom: 1rem;
+      margin-top: 10px;
     }
-    th, td {
-      padding: 4px;
-      text-align: left;
-      border-bottom: 1px dotted #000;
+    table td {
+      padding: 3px;
     }
-    .total-area {
+    hr {
+      border-top: 1px dashed #ccc;
+    }
+    .right {
       text-align: right;
     }
-    .footer {
-      margin-top: 1rem;
-      text-align: center;
-      font-size: 0.9rem;
+    .bold {
+      font-weight: bold;
     }
-    .signature {
-      text-align: right;
-      font-style: italic;
+    .no-print {
+      margin-top: 15px;
     }
     @media print {
-      body *:not(.invoice) {
+      .no-print {
         display: none;
-      }
-      .invoice {
-        box-shadow: none;
-        margin: 0;
       }
     }
   </style>
 </head>
 <body>
-  <div class="invoice">
-    <div class="center title">SADAMATA COFFEE HOUSE</div>
-    <div class="center address">Sadamata Village, Ekterpur, Noapara, Jeshore</div>
-    <div class="center box">INVOICE</div><div>
-  <strong>Bill No:</strong> #0002<br>
-  <strong>Date:</strong> 2025-05-17<br>
-  <strong>Time:</strong> 10:45 AM
-</div>
 
-<table>
-  <thead>
-    <tr>
-      <th>Item</th>
-      <th>Qty</th>
-      <th>Price</th>
-      <th>Total</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr><td>Tea</td><td>2</td><td>15</td><td>30</td></tr>
-    <tr><td>Singara</td><td>3</td><td>10</td><td>30</td></tr>
-    <tr><td>Samosa</td><td>1</td><td>15</td><td>15</td></tr>
-  </tbody>
-</table>
+<div class="invoice-box" id="invoice">
+  <div class="center bold">SADAMATA COFFEE HOUSE</div>
+  <div class="center">Sadamata Village, Ekterpur, Noapara, Jeshore</div>
+  <hr>
+  <div class="center bold" style="border: 1px solid black; display: inline-block; padding: 2px 10px;">INVOICE</div>
 
-<hr>
-<div class="total-area">
-  <div>Subtotal: 75</div>
-  <div>Discount (10%): -7.5</div>
-  <div><strong>Total: 67.5</strong></div>
-</div>
+  <table>
+    <tr><td>Bill No:</td><td id="billNo">1</td></tr>
+    <tr><td>Date:</td><td id="date"></td></tr>
+    <tr><td>Time:</td><td id="time"></td></tr>
+  </table>
 
-<div class="footer">
-  Have a nice day!<br>
-  <div class="signature">Admin Signature</div>
-</div>
+  <table id="items">
+    <thead>
+      <tr class="bold">
+        <td>Item</td><td>Qty</td><td>Price</td><td>Total</td>
+      </tr>
+    </thead>
+    <tbody></tbody>
+  </table>
 
+  <hr>
+
+  <div class="right bold">Subtotal: <span id="subtotal">0</span></div>
+  <div class="right bold">
+    Discount (%):
+    <input type="number" id="discountInput" value="0" style="width: 50px;" onchange="updateTotal()" />
   </div>
+  <div class="right bold">Total: <span id="total">0</span></div>
+
+  <div class="center" style="margin-top: 15px;">Have a nice day!</div>
+</div>
+
+<div class="no-print">
+  <select id="itemSelect">
+    <option value="">--Select Item--</option>
+    <option value="Tea|10">Tea - 10</option>
+    <option value="Coffee|15">Coffee - 15</option>
+    <option value="Cake|20">Cake - 20</option>
+  </select>
+  <input type="number" id="qtyInput" placeholder="Qty" min="1" value="1" style="width: 50px;" />
+  <button onclick="addItem()">Add</button>
+  <button onclick="printInvoice()">Print</button>
+</div>
+
+<script>
+  let subtotal = 0;
+
+  function updateDateTime() {
+    const now = new Date();
+    document.getElementById("date").innerText = now.toLocaleDateString();
+    document.getElementById("time").innerText = now.toLocaleTimeString();
+    let billNo = localStorage.getItem("billNo") || 1;
+    document.getElementById("billNo").innerText = billNo;
+    localStorage.setItem("billNo", parseInt(billNo) + 1);
+  }
+
+  function addItem() {
+    const itemSelect = document.getElementById("itemSelect");
+    const qtyInput = document.getElementById("qtyInput");
+
+    const itemData = itemSelect.value;
+    if (!itemData) return;
+
+    const [name, price] = itemData.split("|");
+    const qty = parseInt(qtyInput.value);
+    const total = qty * parseFloat(price);
+
+    const row = document.createElement("tr");
+    row.innerHTML = `<td>${name}</td><td>${qty}</td><td>${price}</td><td>${total}</td>`;
+    document.querySelector("#items tbody").appendChild(row);
+
+    subtotal += total;
+    document.getElementById("subtotal").innerText = subtotal;
+    updateTotal();
+
+    itemSelect.selectedIndex = 0;
+    qtyInput.value = 1;
+  }
+
+  function updateTotal() {
+    const discount = parseFloat(document.getElementById("discountInput").value || 0);
+    const discountedTotal = subtotal - (subtotal * (discount / 100));
+    document.getElementById("total").innerText = discountedTotal.toFixed(2);
+  }
+
+  function printInvoice() {
+    window.print();
+  }
+
+  updateDateTime();
+</script>
+
 </body>
 </html>
