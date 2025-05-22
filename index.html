@@ -1,145 +1,144 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Sadamatata Invoice</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SADAMATA INVOICE</title>
   <style>
     body {
-      font-family: Arial, sans-serif;
+      font-family: sans-serif;
+      margin: 0;
       padding: 10px;
-      background: #f9f9f9;
+      background: #f5f5f5;
     }
     .invoice-box {
+      background: #fff;
+      padding: 20px;
       max-width: 400px;
       margin: auto;
       border: 1px solid #ccc;
-      padding: 10px;
-      background: white;
     }
-    .center {
+    h1, h2, h3, p {
       text-align: center;
+      margin: 5px 0;
     }
     table {
       width: 100%;
       margin-top: 10px;
+      border-collapse: collapse;
     }
-    table td {
-      padding: 3px;
+    th, td {
+      border-bottom: 1px solid #ddd;
+      padding: 6px;
+      text-align: left;
     }
-    hr {
-      border-top: 1px dashed #ccc;
-    }
-    .right {
+    .total {
       text-align: right;
-    }
-    .bold {
       font-weight: bold;
     }
-    .no-print {
-      margin-top: 15px;
+    .print-only {
+      display: none;
     }
     @media print {
-      .no-print {
-        display: none;
+      body * {
+        visibility: hidden;
+      }
+      .invoice-box, .invoice-box * {
+        visibility: visible;
+      }
+      .invoice-box {
+        position: absolute;
+        left: 0;
+        top: 0;
       }
     }
   </style>
 </head>
 <body>
+  <div class="invoice-box">
+    <h2>SADAMATA COFFEE HOUSE</h2>
+    <p>Sadamata Village, Ekterpur, Noapara, Jeshore</p>
+    <h3 style="border: 1px solid #000; display:inline-block; padding:4px 10px;">INVOICE</h3>
+    <p id="bill-info"></p>
 
-<div class="invoice-box" id="invoice">
-  <div class="center bold">SADAMATA COFFEE HOUSE</div>
-  <div class="center">Sadamata Village, Ekterpur, Noapara, Jeshore</div>
-  <hr>
-  <div class="center bold" style="border: 1px solid black; display: inline-block; padding: 2px 10px;">INVOICE</div>
+    <select id="itemSelect">
+      <option value="">-- Select Item --</option>
+      <option value="Tea|10">Tea - 10</option>
+      <option value="Coffee|20">Coffee - 20</option>
+      <option value="Burger|50">Burger - 50</option>
+    </select>
 
-  <table>
-    <tr><td>Bill No:</td><td id="billNo">1</td></tr>
-    <tr><td>Date:</td><td id="date"></td></tr>
-    <tr><td>Time:</td><td id="time"></td></tr>
-  </table>
+    <button onclick="addItem()">Add</button>
+    <table id="itemTable">
+      <thead>
+        <tr>
+          <th>Item</th><th>Qty</th><th>Price</th><th>Total</th>
+        </tr>
+      </thead>
+      <tbody></tbody>
+    </table>
 
-  <table id="items">
-    <thead>
-      <tr class="bold">
-        <td>Item</td><td>Qty</td><td>Price</td><td>Total</td>
-      </tr>
-    </thead>
-    <tbody></tbody>
-  </table>
+    <hr>
+    <p class="total">Subtotal: <span id="subTotal">0</span></p>
+    <p class="total">Discount (%): <input type="number" id="discount" value="0" onchange="calculateTotal()"></p>
+    <p class="total">Total: <span id="grandTotal">0</span></p>
 
-  <hr>
+    <div id="qrcode" style="text-align:center; margin-top:10px;"></div>
 
-  <div class="right bold">Subtotal: <span id="subtotal">0</span></div>
-  <div class="right bold">
-    Discount (%):
-    <input type="number" id="discountInput" value="0" style="width: 50px;" onchange="updateTotal()" />
+    <p style="text-align:center; margin-top:10px;">Have a nice day!</p>
+    <p style="text-align:right; margin-top:30px;">Admin Signature</p>
+
+    <button onclick="window.print()">Print</button>
   </div>
-  <div class="right bold">Total: <span id="total">0</span></div>
 
-  <div class="center" style="margin-top: 15px;">Have a nice day!</div>
-</div>
+  <script src="https://cdn.jsdelivr.net/npm/qrcode/build/qrcode.min.js"></script>
+  <script>
+    let itemId = 0;
+    function addItem() {
+      const select = document.getElementById("itemSelect");
+      const value = select.value;
+      if (!value) return;
 
-<div class="no-print">
-  <select id="itemSelect">
-    <option value="">--Select Item--</option>
-    <option value="Tea|10">Tea - 10</option>
-    <option value="Coffee|15">Coffee - 15</option>
-    <option value="Cake|20">Cake - 20</option>
-  </select>
-  <input type="number" id="qtyInput" placeholder="Qty" min="1" value="1" style="width: 50px;" />
-  <button onclick="addItem()">Add</button>
-  <button onclick="printInvoice()">Print</button>
-</div>
+      const [name, price] = value.split("|");
+      const table = document.querySelector("#itemTable tbody");
+      const row = document.createElement("tr");
+      row.innerHTML = `<td>${name}</td>
+        <td><input type='number' value='1' onchange='calculateTotal()'></td>
+        <td>${price}</td>
+        <td class='item-total'>${price}</td>`;
+      table.appendChild(row);
+      calculateTotal();
+    }
 
-<script>
-  let subtotal = 0;
+    function calculateTotal() {
+      const rows = document.querySelectorAll("#itemTable tbody tr");
+      let subtotal = 0;
+      rows.forEach(row => {
+        const qty = row.children[1].firstChild.value;
+        const price = row.children[2].innerText;
+        const total = qty * price;
+        row.children[3].innerText = total;
+        subtotal += total;
+      });
 
-  function updateDateTime() {
-    const now = new Date();
-    document.getElementById("date").innerText = now.toLocaleDateString();
-    document.getElementById("time").innerText = now.toLocaleTimeString();
-    let billNo = localStorage.getItem("billNo") || 1;
-    document.getElementById("billNo").innerText = billNo;
-    localStorage.setItem("billNo", parseInt(billNo) + 1);
-  }
+      document.getElementById("subTotal").innerText = subtotal;
+      const discount = parseFloat(document.getElementById("discount").value || 0);
+      const grandTotal = subtotal - (subtotal * discount / 100);
+      document.getElementById("grandTotal").innerText = Math.round(grandTotal);
 
-  function addItem() {
-    const itemSelect = document.getElementById("itemSelect");
-    const qtyInput = document.getElementById("qtyInput");
+      QRCode.toDataURL(`Total: ${Math.round(grandTotal)} | Discount: ${discount}%`, function (err, url) {
+        document.getElementById("qrcode").innerHTML = `<img src="${url}" width="100"/>`;
+      });
+    }
 
-    const itemData = itemSelect.value;
-    if (!itemData) return;
+    function setBillInfo() {
+      const now = new Date();
+      const id = Math.floor(Math.random() * 100000);
+      document.getElementById("bill-info").innerText = `Bill No: ${id} | Time: ${now.toLocaleTimeString()} | Date: ${now.toLocaleDateString()}`;
+    }
 
-    const [name, price] = itemData.split("|");
-    const qty = parseInt(qtyInput.value);
-    const total = qty * parseFloat(price);
-
-    const row = document.createElement("tr");
-    row.innerHTML = `<td>${name}</td><td>${qty}</td><td>${price}</td><td>${total}</td>`;
-    document.querySelector("#items tbody").appendChild(row);
-
-    subtotal += total;
-    document.getElementById("subtotal").innerText = subtotal;
-    updateTotal();
-
-    itemSelect.selectedIndex = 0;
-    qtyInput.value = 1;
-  }
-
-  function updateTotal() {
-    const discount = parseFloat(document.getElementById("discountInput").value || 0);
-    const discountedTotal = subtotal - (subtotal * (discount / 100));
-    document.getElementById("total").innerText = discountedTotal.toFixed(2);
-  }
-
-  function printInvoice() {
-    window.print();
-  }
-
-  updateDateTime();
-</script>
-
+    setBillInfo();
+  </script>
 </body>
 </html>
+
